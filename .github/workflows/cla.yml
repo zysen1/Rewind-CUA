@@ -25,11 +25,15 @@ jobs:
   cla:
     name: cla
     runs-on: ubuntu-latest
+    # Signatures live on trycua/cua's cla-signatures branch. Any other
+    # repository, including a fork, has no such branch. Running the assistant
+    # there asks contributors to sign trycua's CLA.
     if: >-
-      github.event_name == 'pull_request_target' ||
+      github.repository == 'trycua/cua' &&
+      (github.event_name == 'pull_request_target' ||
       (github.event.issue.pull_request &&
       (github.event.comment.body == 'recheck' ||
-      github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA'))
+      github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA')))
     steps:
       - name: Check CLA signatures
         uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08 # v2.6.1

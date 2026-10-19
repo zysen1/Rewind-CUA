@@ -12,6 +12,9 @@ jobs:
   contributor-attribution:
     name: contributor-attribution
     runs-on: ubuntu-latest
+    # Release attribution is a trycua/cua maintainer check against that
+    # repository's component releases. Forks do not publish those releases.
+    if: github.repository == 'trycua/cua'
     steps:
       # For pull_request_target, github.sha is the current commit on the trusted
       # base branch. The PR's recorded base.sha can be stale after main advances.
