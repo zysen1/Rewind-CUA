@@ -1,0 +1,18 @@
+[package]
+name = "rewind-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+description = "rewind: CLI for the Rewind-CUA harness"
+
+[[bin]]
+name = "rewind"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "=4.5.23", features = ["derive"] }
+rewind-core = { path = "../rewind-core" }
+serde_json = "=1.0.134"

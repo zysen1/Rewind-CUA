@@ -1,0 +1,23 @@
+version: 1
+forbidden:
+  - id: no-parent-escape
+    path_regex: "(^|/)\\.\\.(/|$)"
+    reason: the path leaves the workspace
+  - id: no-payments
+    kind: pay
+    reason: payments are forbidden
+require_approval:
+  - id: approve-email
+    kind: send_email
+    reason: outbound mail needs a person
+uncertainty:
+  escalate_below: 0.70
+  agreement_below: 0.67
+  human_below: 0.45
+checkpoint:
+  before:
+    - reversible
+    - irreversible
+    - external
+retry:
+  max_attempts: 2
