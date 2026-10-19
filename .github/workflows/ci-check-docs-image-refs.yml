@@ -48,8 +48,8 @@ jobs:
           echo "$(go env GOPATH)/bin" >>"$GITHUB_PATH"
       # fetch-depth: 0 already fetched every branch on this repository.
       # Fetching origin again needs credentials on a private repository, which
-      # this checkout drops. The ledger is written by trycua's image workflows
-      # onto trycua/cua:image-doctor-ledger. That branch is absent on a fork,
+      # this checkout drops. Image workflows write the ledger only on the
+      # image-doctor-ledger branch of trycua/cua. That branch is absent on a fork,
       # and the same docs then fail even though the nightly run on trycua/cua
       # main is green. Fall back to that public ledger so the gate still
       # requires a passing doctor report. This pull request adds no container
