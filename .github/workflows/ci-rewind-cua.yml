@@ -1,0 +1,60 @@
+name: "CI: Rewind-CUA"
+
+on:
+  pull_request:
+    paths:
+      - "libs/rewind-cua/**"
+      - "REWIND.md"
+      - "NOTICE"
+      - "LICENSING.md"
+      - ".github/workflows/ci-rewind-cua.yml"
+  push:
+    branches: [main]
+    paths:
+      - "libs/rewind-cua/**"
+      - "REWIND.md"
+      - "NOTICE"
+      - "LICENSING.md"
+      - ".github/workflows/ci-rewind-cua.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: journal, policy, rewind
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/rewind-cua
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --locked --workspace
+
+      - name: Eval report matches a fresh run
+        run: |
+          cargo run --locked --quiet -- eval --out /tmp/rewind-results.json
+          python3 -c 'import json,pathlib; a=json.loads(pathlib.Path("eval/results.json").read_text()); b=json.loads(pathlib.Path("/tmp/rewind-results.json").read_text()); assert a==b, (a,b)'
+
+      - name: Replay the committed demo journal
+        run: cargo run --locked --quiet -- replay demo/mistaken-delete.rewind.jsonl

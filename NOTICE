@@ -1,0 +1,20 @@
+NOTICE
+
+This repository is a fork of trycua/cua.
+
+Built on trycua/cua
+https://github.com/trycua/cua
+Upstream license: MIT (LICENSE.md), except where a subdirectory carries its
+own license. Copyright (c) 2025 Cua AI, Inc. and contributors, for the upstream
+code. See LICENSING.md.
+
+Changes
+The Rewind-CUA harness is original code under libs/rewind-cua/ (MIT, copyright
+2026 zysen1). REWIND.md documents it in English and Chinese. Those additions
+do not relicense the upstream tree.
+
+Rewind-CUA adds an append-only action journal, workspace checkpoints and
+rewind, a YAML action policy, and uncertainty escalation to a stronger model
+or a person. The snapshot notes in libs/rewind-cua/docs/SNAPSHOTS.md describe
+the QEMU and Lume mechanisms this harness can call, and the ones it does not
+treat as named rewind points.
