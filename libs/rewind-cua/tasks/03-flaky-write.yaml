@@ -1,0 +1,30 @@
+id: flaky-write
+title: Bad write, then a corrected write
+goal: Leave report.txt as the final text.
+setup:
+  - path: report.txt
+    contents: "seed\n"
+expect:
+  files:
+    report.txt: "final\n"
+  outbox_empty: true
+weak:
+  confidence: 0.88
+  samples:
+    - write_file:report.txt
+    - write_file:report.txt
+    - write_file:report.txt
+  action:
+    kind: write_file
+    path: report.txt
+    contents: "CORRUPT\n"
+strong:
+  confidence: 0.91
+  samples:
+    - write_file:report.txt
+    - write_file:report.txt
+    - write_file:report.txt
+  action:
+    kind: write_file
+    path: report.txt
+    contents: "final\n"

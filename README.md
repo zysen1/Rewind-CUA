@@ -62,6 +62,12 @@
 
 Bring your own agent and model, or explore CUA-S1 for specialized decisions. Cua provides the computer and automation tools. [Computer-Use 2.0](https://cua.ai/docs/cua-driver/concepts/how-cua-driver-works) describes an agent moving between code, APIs, and graphical interfaces within the same task.
 
+## Rewind-CUA
+
+**Built on trycua/cua.** This fork adds [Rewind-CUA](REWIND.md): an append-only action journal, workspace checkpoints, automatic rewind when a step fails its check, and escalation to a stronger model or a person when the executor is unsure or a YAML policy requires approval.
+
+The extension is a separate Rust workspace in [`libs/rewind-cua`](libs/rewind-cua). It does not replace the upstream sandboxes. The scripted comparison (no live model) is 6/6 versus 1/6 on six tasks, with Cua-Bench and OSWorld marked WIP. The demo is an executor deleting `report.txt` and the harness restoring it: [REWIND.md](REWIND.md).
+
 ---
 
 ## Cua Spaces
@@ -219,6 +225,7 @@ uv tool run --from 'cua-bench[browser]' playwright install chromium
 | [Cua Spaces for macOS](apps/cua-spaces-macos/README.md) | The Spaces app on macOS: menu bar and notch, live streams, teleport, agent threads   |
 | [Cua Spaces core](apps/cua-spaces/README.md)            | The shared Spaces app core, and the Tauri app for Linux and Windows                  |
 | [cua-bench](libs/cua-bench/README.md)                   | Benchmarks and RL environments for computer-use                                      |
+| [Rewind-CUA](libs/rewind-cua/README.md)                 | Journal, checkpoints, rewind, and uncertainty escalation. Built on trycua/cua.       |
 | [lume](https://cua.ai/docs/lume/reference/cli) | macOS/Linux VM management on Apple Silicon                                          |
 | [lumier](libs/lumier/README.md)                         | Docker-compatible interface for Lume VMs                                             |
 

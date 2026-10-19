@@ -1,0 +1,26 @@
+Rewind-CUA
+Copyright (c) 2026 zysen1
+
+This directory is original work added on top of trycua/cua. It is MIT-licensed
+(see LICENSE in this directory). It is not part of the upstream Cua release
+trains.
+
+Built on trycua/cua
+https://github.com/trycua/cua
+Copyright (c) 2025 Cua AI, Inc. and contributors
+The rest of this repository stays under the license stated in the root
+LICENSE.md and in each package LICENSE file. Rewind-CUA does not relicense
+that code.
+
+What this directory adds
+- An append-only action journal (SHA-256 hash chain and a tip sidecar).
+- Workspace checkpoints and rewind, plus a command seam for upstream QEMU
+  savevm/loadvm and Lume stop-clone checkpoints. See docs/SNAPSHOTS.md.
+- A YAML policy for forbidden actions and actions that need approval.
+- An uncertainty gate: low confidence or low sample agreement escalates to a
+  stronger model, or to a person when the action is dangerous and very unsure.
+  The idea follows LEASH (https://arxiv.org/abs/2610.22280). This is not a
+  reproduction of that paper's models or experiments.
+- A six-task scripted comparison of a one-shot executor against this harness.
+  Cua-Bench and OSWorld were not run.
+- A demo journal, storyboard, and GIF of a mistaken delete that is rewound.

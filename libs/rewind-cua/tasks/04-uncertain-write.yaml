@@ -1,0 +1,30 @@
+id: uncertain-write
+title: Low confidence, escalate before writing
+goal: Leave report.txt as the final text without applying the weak write.
+setup:
+  - path: report.txt
+    contents: "seed\n"
+expect:
+  files:
+    report.txt: "final\n"
+  outbox_empty: true
+weak:
+  confidence: 0.50
+  samples:
+    - write_file:report.txt
+    - "noop"
+    - write_file:other.txt
+  action:
+    kind: write_file
+    path: report.txt
+    contents: "WRONG\n"
+strong:
+  confidence: 0.92
+  samples:
+    - write_file:report.txt
+    - write_file:report.txt
+    - write_file:report.txt
+  action:
+    kind: write_file
+    path: report.txt
+    contents: "final\n"

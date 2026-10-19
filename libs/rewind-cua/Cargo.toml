@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["crates/rewind-core", "crates/rewind-cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+rust-version = "1.83"
+authors = ["zysen1"]
+description = "Rewind-CUA: a journaled, rewindable computer-use harness built on trycua/cua"
+repository = "https://github.com/trycua/cua"
