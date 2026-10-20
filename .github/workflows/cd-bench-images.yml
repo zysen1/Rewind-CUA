@@ -88,6 +88,7 @@ env:
 
 jobs:
   checks:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -134,7 +135,7 @@ jobs:
   #   cua images release libs/images/bench/osworld --stamp STAMP --steps prepare,build,gate
   build:
     needs: meta
-    if: inputs.promote_stamp == ''
+    if: github.repository == 'trycua/cua' && (inputs.promote_stamp == '')
     strategy:
       fail-fast: false
       matrix:
@@ -207,7 +208,7 @@ jobs:
           if-no-files-found: warn
 
   index:
-    if: inputs.push && inputs.promote_stamp == ''
+    if: github.repository == 'trycua/cua' && (inputs.push && inputs.promote_stamp == '')
     needs: [meta, build]
     runs-on: ubuntu-latest
     permissions:
@@ -261,7 +262,9 @@ jobs:
   # promote_stamp).
   verify:
     needs: [meta, index]
-    if: ${{ !cancelled() && inputs.push && (needs.index.result == 'success' || (inputs.promote_stamp != '' && needs.index.result == 'skipped')) }}
+    if: >-
+      github.repository == 'trycua/cua' &&
+      (!cancelled() && inputs.push && (needs.index.result == 'success' || (inputs.promote_stamp != '' && needs.index.result == 'skipped')))
     strategy:
       fail-fast: false
       matrix:
@@ -330,7 +333,7 @@ jobs:
 
   promote:
     needs: [meta, verify]
-    if: ${{ !cancelled() && needs.verify.result == 'success' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.verify.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       # contents: write for the image-doctor-ledger branch (attest) and the

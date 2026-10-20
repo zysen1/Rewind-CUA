@@ -69,6 +69,7 @@ env:
 
 jobs:
   plan:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       run: ${{ steps.plan.outputs.run }}
@@ -115,7 +116,7 @@ jobs:
 
   tiers:
     needs: plan
-    if: needs.plan.outputs.run == 'true' && vars.CUA_MACOS_LUME_RUNNER != ''
+    if: github.repository == 'trycua/cua' && (needs.plan.outputs.run == 'true' && vars.CUA_MACOS_LUME_RUNNER != '')
     runs-on: ${{ fromJSON(format('["self-hosted","macOS","ARM64","{0}"]', vars.CUA_MACOS_LUME_RUNNER)) }}
     timeout-minutes: 360
     permissions:
@@ -223,7 +224,7 @@ jobs:
 
   tracking-issue:
     needs: [plan, tiers]
-    if: failure() && github.event_name == 'schedule'
+    if: github.repository == 'trycua/cua' && (failure() && github.event_name == 'schedule')
     runs-on: ubuntu-latest
     permissions:
       issues: write

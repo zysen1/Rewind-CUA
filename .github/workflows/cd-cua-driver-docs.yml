@@ -35,6 +35,7 @@ env:
 
 jobs:
   native-snapshot:
+    if: github.repository == 'trycua/cua'
     name: Dump the ${{ matrix.platform }} MCP registry
     strategy:
       fail-fast: false
@@ -77,6 +78,7 @@ jobs:
           if-no-files-found: error
 
   regenerate-reference-docs:
+    if: github.repository == 'trycua/cua'
     name: Regenerate cua-driver reference
     needs: native-snapshot
     runs-on: ubuntu-latest

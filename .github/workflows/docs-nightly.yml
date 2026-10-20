@@ -97,7 +97,7 @@ jobs:
   report:
     name: open or update the nightly issue
     needs: [windows, lume, lume-vm]
-    if: failure() && github.event_name == 'schedule'
+    if: github.repository == 'trycua/cua' && (failure() && github.event_name == 'schedule')
     runs-on: ubuntu-latest
     permissions:
       issues: write

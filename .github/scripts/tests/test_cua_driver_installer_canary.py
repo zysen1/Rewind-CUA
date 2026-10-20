@@ -75,7 +75,10 @@ def test_canary_uses_default_resolution_on_every_platform(workflow: dict) -> Non
 def test_failures_open_one_bug_issue_per_canary(workflow: dict) -> None:
     report = workflow["jobs"]["report"]
     assert set(report["needs"]) == {"check", "canary"}
-    assert report["if"] == "always() && (needs.check.result == 'failure' || needs.canary.result == 'failure')"
+    assert report["if"] == (
+        "github.repository == 'trycua/cua' && "
+        "(always() && (needs.check.result == 'failure' || needs.canary.result == 'failure'))"
+    )
     run = step(report, "Open or update monitoring issues")["run"]
     assert "--label bug" in run
     assert "Cua Driver canonical installer canary is failing" in run

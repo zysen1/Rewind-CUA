@@ -25,6 +25,7 @@ permissions:
 
 jobs:
   prepare:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -56,6 +57,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   promote:
+    if: github.repository == 'trycua/cua'
     needs: prepare
     name: Promote ${{ matrix.platform }} wheel
     runs-on: ${{ matrix.runner }}
@@ -223,6 +225,7 @@ jobs:
           if-no-files-found: error
 
   validate:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, promote]
     runs-on: ubuntu-latest
     steps:
@@ -267,6 +270,7 @@ jobs:
           PY
 
   publish:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, validate]
     runs-on: ubuntu-latest
     environment: pypi-fleet
@@ -326,6 +330,7 @@ jobs:
             python -m twine upload --verbose "${files[@]}"
 
   create-release:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, publish]
     uses: ./.github/workflows/release-github-reusable.yml
     with:

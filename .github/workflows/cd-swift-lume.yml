@@ -73,6 +73,7 @@ env:
 
 jobs:
   notarize:
+    if: github.repository == 'trycua/cua'
     runs-on: macos-15
     outputs:
       version: ${{ steps.set_version.outputs.version }}
@@ -277,7 +278,7 @@ jobs:
 
   release:
     needs: notarize
-    if: startsWith(github.ref, 'refs/tags/lume-v')
+    if: github.repository == 'trycua/cua' && (startsWith(github.ref, 'refs/tags/lume-v'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

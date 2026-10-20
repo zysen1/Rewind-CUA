@@ -68,9 +68,8 @@ env:
 jobs:
   check:
     if: >-
-      github.event_name != 'release' ||
-      startsWith(github.event.release.tag_name, 'cua-driver-rs-v') ||
-      startsWith(github.event.release.tag_name, 'lume-v')
+      github.repository == 'trycua/cua' &&
+      (github.event_name != 'release' || startsWith(github.event.release.tag_name, 'cua-driver-rs-v') || startsWith(github.event.release.tag_name, 'lume-v'))
     runs-on: ubuntu-latest
     outputs:
       failures: ${{ steps.endpoints.outputs.failures }}
@@ -130,8 +129,8 @@ jobs:
   canary:
     name: "canonical installer / ${{ matrix.os }} (${{ github.event_name == 'push' && 'pushed scripts' || 'cua.ai' }})"
     if: >-
-      github.event_name != 'release' ||
-      startsWith(github.event.release.tag_name, 'cua-driver-rs-v')
+      github.repository == 'trycua/cua' &&
+      (github.event_name != 'release' || startsWith(github.event.release.tag_name, 'cua-driver-rs-v'))
     strategy:
       fail-fast: false
       matrix:
@@ -254,7 +253,7 @@ jobs:
   report:
     name: Report installer canary failures
     needs: [check, canary]
-    if: always() && (needs.check.result == 'failure' || needs.canary.result == 'failure')
+    if: github.repository == 'trycua/cua' && (always() && (needs.check.result == 'failure' || needs.canary.result == 'failure'))
     runs-on: ubuntu-latest
     steps:
       - name: Open or update monitoring issues

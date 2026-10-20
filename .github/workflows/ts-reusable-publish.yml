@@ -34,6 +34,7 @@ permissions:
 
 jobs:
   publish:
+    if: github.repository == 'trycua/cua'
     permissions:
       id-token: write
       contents: read

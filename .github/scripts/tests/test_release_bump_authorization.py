@@ -41,7 +41,10 @@ class TestReleaseBumpAuthorization(unittest.TestCase):
         self.assertIn("            *)\n", authorize_job)
         self.assertIn("              exit 1\n", authorize_job)
         self.assertNotIn("r33drichards", workflow)
-        self.assertIn("  bump-version:\n    needs: authorize\n", workflow)
+        self.assertIn(
+            "  bump-version:\n    if: github.repository == 'trycua/cua'\n    needs: authorize\n",
+            workflow,
+        )
         self.assertIn(
             "    permissions:\n      contents: write\n    steps:\n",
             workflow,

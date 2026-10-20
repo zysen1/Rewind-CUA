@@ -40,6 +40,7 @@ permissions:
 
 jobs:
   build-and-push:
+    if: github.repository == 'trycua/cua'
     runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     strategy:
       fail-fast: false

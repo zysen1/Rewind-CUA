@@ -96,6 +96,7 @@ env:
 
 jobs:
   meta:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
@@ -137,6 +138,7 @@ jobs:
           } | tee -a "$GITHUB_OUTPUT"
 
   spacesd:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -150,6 +152,7 @@ jobs:
           retention-days: 7
 
   cli:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -176,6 +179,7 @@ jobs:
   # verify and promote. Reproduce locally:
   #   cua images release libs/images/omarchy --stamp STAMP [--publish --promote]
   release:
+    if: github.repository == 'trycua/cua'
     needs: [meta, spacesd, cli]
     runs-on: ubuntu-24.04
     timeout-minutes: 180
@@ -245,7 +249,7 @@ jobs:
   # A failed scheduled run opens (or comments on) one tracking issue.
   report-schedule-failure:
     needs: [meta, spacesd, cli, release]
-    if: failure() && github.event_name == 'schedule'
+    if: github.repository == 'trycua/cua' && (failure() && github.event_name == 'schedule')
     runs-on: ubuntu-latest
     permissions:
       contents: read

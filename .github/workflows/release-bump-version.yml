@@ -34,6 +34,7 @@ permissions: {}
 
 jobs:
   authorize:
+    if: github.repository == 'trycua/cua'
     name: Authorize version bump
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +54,7 @@ jobs:
           esac
 
   bump-version:
+    if: github.repository == 'trycua/cua'
     needs: authorize
     runs-on: ubuntu-latest
     permissions:

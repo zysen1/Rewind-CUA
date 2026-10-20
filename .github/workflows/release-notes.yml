@@ -46,6 +46,7 @@ concurrency:
 
 jobs:
   notes:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.event.inputs.tag || github.ref_name }}

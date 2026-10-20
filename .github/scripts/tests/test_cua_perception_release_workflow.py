@@ -112,7 +112,7 @@ def test_inputs_cover_every_target_and_publish_only_on_tag_runs() -> None:
 def test_candidate_reuses_the_reviewed_signing_workflow_for_the_tag() -> None:
     job = workflow()["jobs"]["candidate"]
     assert job["uses"] == "./.github/workflows/cd-cua-perception-candidate.yml"
-    assert job["if"] == "needs.resolve.outputs.publish == 'true'"
+    assert job["if"] == "github.repository == 'trycua/cua' && (needs.resolve.outputs.publish == 'true')"
     assert needs(job) == {"resolve", "input"}
     inputs = job["with"]
     assert inputs["payload_run_id"] == "${{ fromJSON(github.run_id) }}"
@@ -133,7 +133,7 @@ def test_candidate_reuses_the_reviewed_signing_workflow_for_the_tag() -> None:
 def test_verify_installs_each_signed_catalog_with_the_published_driver() -> None:
     job = workflow()["jobs"]["verify"]
     assert needs(job) == {"resolve", "candidate"}
-    assert job["if"] == "needs.resolve.outputs.publish == 'true'"
+    assert job["if"] == "github.repository == 'trycua/cua' && (needs.resolve.outputs.publish == 'true')"
     assert {entry["target"] for entry in job["strategy"]["matrix"]["include"]} == TARGETS
     script = run_text(job)
     assert "libs/cua-driver/scripts/install.sh" in script

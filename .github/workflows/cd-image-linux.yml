@@ -138,7 +138,7 @@ env:
 
 jobs:
   meta:
-    if: inputs.promote_run == '' && inputs.doctor_children == ''
+    if: github.repository == 'trycua/cua' && (inputs.promote_run == '' && inputs.doctor_children == '')
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.meta.outputs.tag }}
@@ -208,7 +208,7 @@ jobs:
 
   spacesd:
     needs: meta
-    if: needs.meta.outputs.spacesd_source == 'local'
+    if: github.repository == 'trycua/cua' && (needs.meta.outputs.spacesd_source == 'local')
     strategy:
       fail-fast: false
       matrix:
@@ -230,7 +230,7 @@ jobs:
           retention-days: 7
 
   cli:
-    if: inputs.promote_run == '' && inputs.doctor_children == ''
+    if: github.repository == 'trycua/cua' && (inputs.promote_run == '' && inputs.doctor_children == '')
     strategy:
       fail-fast: false
       matrix:
@@ -267,7 +267,7 @@ jobs:
   release:
     needs: [meta, spacesd, cli]
     # spacesd is skipped unless source=local; run anyway, but not after a failure.
-    if: ${{ !cancelled() && needs.meta.result == 'success' && needs.cli.result == 'success' && needs.spacesd.result != 'failure' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.meta.result == 'success' && needs.cli.result == 'success' && needs.spacesd.result != 'failure')
     strategy:
       fail-fast: false
       matrix:
@@ -328,6 +328,7 @@ jobs:
           retention-days: 7
 
   plain:
+    if: github.repository == 'trycua/cua'
     needs: cli
     strategy:
       fail-fast: false
@@ -398,7 +399,7 @@ jobs:
     # !cancelled(): with spacesd_source=release the spacesd job is skipped, and a
     # skipped ancestor would otherwise skip every job below it (publish=true then
     # pushes nothing while the run still reports success).
-    if: ${{ !cancelled() && needs.release.result == 'success' && needs.meta.outputs.publish == 'true' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.release.result == 'success' && needs.meta.outputs.publish == 'true')
     runs-on: ubuntu-latest
     outputs:
       tiers: ${{ steps.changes.outputs.tiers }}
@@ -438,7 +439,7 @@ jobs:
   # doctored bytes as dated, immutable per-arch children (release step push/<arch>).
   push:
     needs: [meta, release, changes]
-    if: ${{ !cancelled() && needs.changes.result == 'success' && needs.changes.outputs.tiers != '[]' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.changes.result == 'success' && needs.changes.outputs.tiers != '[]')
     strategy:
       fail-fast: true
       matrix:
@@ -497,7 +498,7 @@ jobs:
   # verify, promote).
   publish:
     needs: [meta, changes, push]
-    if: ${{ !cancelled() && needs.push.result == 'success' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.push.result == 'success')
     strategy:
       # One tier at a time: both push to the image-doctor-ledger branch. (A
       # concurrency group would cancel a third pending job; ledger_push also
@@ -547,7 +548,7 @@ jobs:
   # promote did not run): the same `cua images release --steps verify,promote`
   # over that run's evidence. Nothing is built or pushed except the floating tags.
   promote-run:
-    if: github.event_name == 'workflow_dispatch' && inputs.promote_run != ''
+    if: github.repository == 'trycua/cua' && (github.event_name == 'workflow_dispatch' && inputs.promote_run != '')
     strategy:
       # One tier at a time: both push to the image-doctor-ledger branch.
       max-parallel: 1
@@ -616,7 +617,7 @@ jobs:
   # becomes an OCI referrer and an image-doctor ledger entry. No image is
   # pushed or re-tagged. Dispatch with doctor_children=arm64@sha256:...,...
   doctor-children-plan:
-    if: github.event_name == 'workflow_dispatch' && inputs.doctor_children != ''
+    if: github.repository == 'trycua/cua' && (github.event_name == 'workflow_dispatch' && inputs.doctor_children != '')
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.m.outputs.matrix }}
@@ -638,6 +639,7 @@ jobs:
           echo "matrix=$m" >>"$GITHUB_OUTPUT"
 
   doctor-children:
+    if: github.repository == 'trycua/cua'
     needs: doctor-children-plan
     strategy:
       fail-fast: false
@@ -696,7 +698,7 @@ jobs:
           if-no-files-found: warn
 
   tag-safety-test:
-    if: github.event_name == 'pull_request'
+    if: github.repository == 'trycua/cua' && (github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -720,7 +722,7 @@ jobs:
   # A failed scheduled run opens (or comments on) one tracking issue.
   report-schedule-failure:
     needs: [meta, spacesd, cli, release, plain, changes, push, publish]
-    if: failure() && github.event_name == 'schedule'
+    if: github.repository == 'trycua/cua' && (failure() && github.event_name == 'schedule')
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -23,6 +23,7 @@ permissions:
 
 jobs:
   prepare:
+    if: github.repository == 'trycua/cua'
     runs-on: macos-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -144,6 +145,7 @@ jobs:
           grep -E "cua-sandbox|cua-core" pyproject.toml
 
   publish:
+    if: github.repository == 'trycua/cua'
     needs: prepare
     uses: ./.github/workflows/py-reusable-publish.yml
     with:
@@ -155,6 +157,7 @@ jobs:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
   set-env-variables:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, publish]
     runs-on: macos-latest
     steps:
@@ -164,6 +167,7 @@ jobs:
           echo "CORE_VERSION=${{ needs.prepare.outputs.core_version }}" >> $GITHUB_ENV
 
   create-release:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, publish]
     uses: ./.github/workflows/release-github-reusable.yml
     with:

@@ -40,6 +40,7 @@ permissions:
 
 jobs:
   plan:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       should_build: ${{ steps.plan.outputs.shouldBuild }}
@@ -106,7 +107,7 @@ jobs:
 
   report-attribution-hold:
     needs: plan
-    if: needs.plan.outputs.reason == 'held-attribution'
+    if: github.repository == 'trycua/cua' && (needs.plan.outputs.reason == 'held-attribution')
     runs-on: ubuntu-latest
     steps:
       - name: Create or refresh the attribution hold

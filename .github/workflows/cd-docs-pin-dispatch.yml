@@ -35,6 +35,7 @@ concurrency:
 
 jobs:
   dispatch:
+    if: github.repository == 'trycua/cua'
     name: Notify trycua/cloud
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -49,6 +49,7 @@ concurrency:
 
 jobs:
   package:
+    if: github.repository == 'trycua/cua'
     name: verify and package ${{ inputs.target_triple }}
     runs-on: ${{ inputs.target_os == 'windows' && 'windows-latest' || inputs.target_os == 'macos' && 'macos-15' || inputs.target_os == 'linux' && 'ubuntu-latest' || 'invalid-runner' }}
     steps:
@@ -151,6 +152,7 @@ jobs:
           retention-days: 1
 
   sign:
+    if: github.repository == 'trycua/cua'
     name: sign verified ${{ inputs.target_triple }} catalog
     needs: package
     runs-on: ubuntu-latest
