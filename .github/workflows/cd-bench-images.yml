@@ -101,7 +101,7 @@ jobs:
 
   meta:
     # A dispatch, or a call (which sees its caller's event).
-    if: github.repository == 'trycua/cua' && (github.event_name != 'pull_request')
+    if: github.event_name != 'pull_request'
     needs: checks
     runs-on: ubuntu-latest
     outputs:
