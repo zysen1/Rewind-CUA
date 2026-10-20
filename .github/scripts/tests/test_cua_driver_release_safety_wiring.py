@@ -107,7 +107,7 @@ def test_publishing_without_notarization_fails_before_any_build(cd: dict) -> Non
 def test_every_publishing_path_is_a_notarized_path(cd: dict) -> None:
     """The release job's trigger must imply CAN_PUBLISH, which implies DO_NOTARIZE via the guard."""
     release = cd["jobs"]["release"]
-    assert release["if"] == TAG_PUSH
+    assert release["if"] == f"github.repository == 'trycua/cua' && ({TAG_PUSH})"
     dispatch = cd[True]["workflow_dispatch"]["inputs"]
     assert "publish" not in dispatch
     assert "inputs.publish" not in CD.read_text(encoding="utf-8")
@@ -133,16 +133,18 @@ def test_signature_jobs_verify_exact_candidate_archives(cd: dict) -> None:
     assert needs(windows) == {"release-attribution-preflight", "build-windows"}
     assert macos["with"]["verify_macos"] is True and macos["with"]["verify_windows"] is False
     assert windows["with"]["verify_macos"] is False and windows["with"]["verify_windows"] is True
-    # The macOS gate runs for exactly the builds that notarize.
-    assert "${{ " + macos["if"] + " }}" == DO_NOTARIZE
-    assert "if" not in windows
+    # The macOS gate runs for exactly the builds that notarize, and only on
+    # trycua/cua. Forks skip the job; upstream still notarizes the same refs.
+    notarize = DO_NOTARIZE.removeprefix("${{ ").removesuffix(" }}")
+    assert macos["if"] == f"github.repository == 'trycua/cua' && ({notarize})"
+    assert windows["if"] == "github.repository == 'trycua/cua'"
 
 
 def test_release_job_needs_signature_verification(cd: dict) -> None:
     release = cd["jobs"]["release"]
     assert {"verify-release-artifacts"} | SIGNATURE_GATES | E2E_GATES <= needs(release)
     for gate in E2E_GATES:
-        assert cd["jobs"][gate]["if"] == E2E_GATE_IF
+        assert cd["jobs"][gate]["if"] == f"github.repository == 'trycua/cua' && ({E2E_GATE_IF})"
     assert not any(override in release["if"] for override in STATUS_OVERRIDES)
     publish = step(release, "Publish the verified Release Please draft")
     assert release["steps"].index(step(release, "Refuse to publish unverified or unnotarized artifacts")) < release["steps"].index(publish)
@@ -161,10 +163,11 @@ def test_installer_bake_needs_post_publication_verification(cd: dict) -> None:
     assert installers["with"] == {"versions": "${{ needs.release.outputs.version }}"}
     for job in (signatures, installers):
         assert needs(job) == {"release"}
-        assert "if" not in job
+        # No status override: on trycua/cua the job still runs whenever release did.
+        assert job["if"] == "github.repository == 'trycua/cua'"
 
     assert needs(bake) == {"release", "verify-published-signatures", "verify-published-installers"}
-    assert "if" not in bake
+    assert bake["if"] == "github.repository == 'trycua/cua'"
     advance = step(bake, "Advance public installer version on main")
     assert advance["env"]["VERSION"] == "${{ needs.release.outputs.version }}"
     assert "--withdrawn-path \"$UPDATE_ROOT/.github/release-state/cua-driver-rs-withdrawn-versions\"" in advance["run"]

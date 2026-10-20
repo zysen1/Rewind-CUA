@@ -83,6 +83,7 @@ jobs:
   # single-quoted block, which left build-macos-golden.sh unrunnable for its
   # entire life.
   coverage:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,6 +91,7 @@ jobs:
         run: bash apps/cua-spaces/scripts/golden/check-golden-coverage.sh
 
   build-sign:
+    if: github.repository == 'trycua/cua'
     needs: coverage
     runs-on: macos-26
     env:
@@ -185,6 +187,7 @@ jobs:
             CuaSpacesd.app.zip
 
   golden:
+    if: github.repository == 'trycua/cua'
     needs: build-sign
     # Self-hosted Apple-Silicon macOS runner with `lume` + a base image. The TCC
     # seed + `lume push` cannot run on a GitHub-hosted runner.

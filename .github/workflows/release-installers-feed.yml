@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
   publish:
+    if: github.repository == 'trycua/cua'
     name: Publish the installer and uninstaller scripts to cua-install-latest
     runs-on: ubuntu-latest
     steps:

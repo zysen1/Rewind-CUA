@@ -65,7 +65,7 @@ env:
 
 jobs:
   bins:
-    if: (inputs.stage || 'probe') != 'probe'
+    if: github.repository == 'trycua/cua' && ((inputs.stage || 'probe') != 'probe')
     runs-on: windows-latest
     timeout-minutes: 90
     env:
@@ -135,7 +135,7 @@ jobs:
           retention-days: 7
 
   cli:
-    if: (inputs.stage || 'probe') != 'probe'
+    if: github.repository == 'trycua/cua' && ((inputs.stage || 'probe') != 'probe')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -161,7 +161,7 @@ jobs:
   #   cua images release libs/images/windows-2022 --var bin=DIR [--publish --promote]
   image:
     needs: [bins, cli]
-    if: ${{ !cancelled() && needs.bins.result != 'failure' && needs.cli.result != 'failure' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.bins.result != 'failure' && needs.cli.result != 'failure')
     runs-on: ubuntu-24.04
     timeout-minutes: 300
     permissions:
@@ -247,7 +247,7 @@ jobs:
   # The strict doctor again, on a fresh runner, against the exact pushed disk.
   verify:
     needs: [cli, image]
-    if: ${{ !cancelled() && needs.image.result == 'success' && (inputs.stage || 'probe') == 'publish' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.image.result == 'success' && (inputs.stage || 'probe') == 'publish')
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     permissions:
@@ -293,7 +293,7 @@ jobs:
   # Moving tags, only after the pushed digest passed the strict doctor.
   promote:
     needs: [cli, image, verify]
-    if: ${{ !cancelled() && needs.verify.result == 'success' }}
+    if: github.repository == 'trycua/cua' && (!cancelled() && needs.verify.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       # contents: write for the image-doctor-ledger branch (attest).

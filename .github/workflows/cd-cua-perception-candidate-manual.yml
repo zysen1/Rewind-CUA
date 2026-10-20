@@ -45,6 +45,7 @@ permissions:
 
 jobs:
   candidate:
+    if: github.repository == 'trycua/cua'
     name: candidate ${{ matrix.target_triple }}
     strategy:
       fail-fast: false

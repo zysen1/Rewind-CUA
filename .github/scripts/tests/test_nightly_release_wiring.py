@@ -20,8 +20,9 @@ def test_driver_stable_publish_gate_and_workflow_name_are_frozen():
     # Only the stable tag push publishes. Nightly workflow_call runs inherit
     # the caller's schedule/workflow_dispatch event and can never match.
     assert (
-        "    if: github.event_name == 'push' && "
-        "startsWith(github.ref, 'refs/tags/cua-driver-rs-v')\n"
+        "    if: github.repository == 'trycua/cua' && "
+        "(github.event_name == 'push' && "
+        "startsWith(github.ref, 'refs/tags/cua-driver-rs-v'))\n"
     ) in release
     assert "inputs.publish" not in driver
     sdk = source("cd-py-cua-driver.yml")
@@ -47,7 +48,10 @@ def test_driver_nightly_publishes_only_after_the_desktop_e2e_gate():
         ("e2e-standalone-browsers", "ref"),
     ):
         block = driver.split(f"\n  {job}:\n", 1)[1].split("\n\n", 1)[0]
-        assert f"    if: ({TAG_PUSH}) || inputs.channel == 'nightly'\n" in block
+        assert (
+            "    if: github.repository == 'trycua/cua' && "
+            f"(({TAG_PUSH}) || inputs.channel == 'nightly')\n"
+        ) in block
         assert f"\n      {sha_input}: {gate_sha}" in block
     # A failed suite fails the reusable build, and publish requires a
     # successful build with no status-function bypass.
@@ -61,7 +65,10 @@ def test_driver_nightly_publishes_only_after_the_desktop_e2e_gate():
 
 def test_lume_stable_publish_gate_remains_tag_only():
     lume = source("cd-swift-lume.yml")
-    assert "if: startsWith(github.ref, 'refs/tags/lume-v')" in lume
+    assert (
+        "if: github.repository == 'trycua/cua' && (startsWith(github.ref, 'refs/tags/lume-v'))"
+        in lume
+    )
     assert (
         "BUNDLE_VERSION: ${{ inputs.bundle_version || steps.set_version.outputs.version }}" in lume
     )

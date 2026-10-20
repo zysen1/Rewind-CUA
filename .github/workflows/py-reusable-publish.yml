@@ -42,6 +42,7 @@ permissions:
 
 jobs:
   build-and-publish:
+    if: github.repository == 'trycua/cua'
     runs-on: macos-latest
     permissions:
       contents: read

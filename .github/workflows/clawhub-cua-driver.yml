@@ -95,7 +95,7 @@ jobs:
 
   publish:
     name: Publish ${{ inputs.version }} as @${{ inputs.owner }}/driver
-    if: github.event_name == 'workflow_dispatch'
+    if: github.repository == 'trycua/cua' && (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     permissions:
       contents: read

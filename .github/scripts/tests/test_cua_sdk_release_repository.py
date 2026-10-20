@@ -22,6 +22,11 @@ RELEASE_WORKFLOWS = ("cd-cua-sdk.yml", "cd-cua-spacesd.yml", "cd-cua-spaces.yml"
 CANONICAL = "github.repository == 'trycua/cua'"
 
 
+def gated(expr: str) -> str:
+    """Job condition after the fork gate is ANDed on."""
+    return f"{CANONICAL} && ({expr})"
+
+
 def text(name: str) -> str:
     return (WORKFLOWS / name).read_text()
 
@@ -100,9 +105,11 @@ def test_spaces_signing_fails_closed_only_on_trycua_cua() -> None:
 def test_spaces_releases_macos_only_for_now() -> None:
     jobs = workflow("cd-cua-spaces.yml")["jobs"]
     # The Tauri Linux/Windows job is kept but off unless explicitly enabled.
-    assert jobs["build-linux-windows"]["if"] == "vars.CUA_SPACES_LINUX_WINDOWS == 'true'"
+    assert jobs["build-linux-windows"]["if"] == gated("vars.CUA_SPACES_LINUX_WINDOWS == 'true'")
     # The SwiftUI app builds on every release; only an Electron dry run skips it.
-    assert jobs["build-macos"]["if"] == "github.event_name != 'workflow_dispatch' || !inputs.electron_dry_run"
+    assert jobs["build-macos"]["if"] == gated(
+        "github.event_name != 'workflow_dispatch' || !inputs.electron_dry_run"
+    )
     # Publishing runs with the Tauri job skipped, never after it failed.
     gate = jobs["installer-manifest"]["if"]
     assert "!cancelled()" in gate
@@ -131,10 +138,10 @@ def test_spaces_electron_builds_only_for_prereleases_and_dry_runs() -> None:
     plan = step("cd-cua-spaces.yml", "electron-plan", "Plan")["run"]
     assert 'beta=false; [[ "$VERSION" == *-* ]] && beta=true' in plan
     assert '[ "$DRY_RUN" != true ]' in plan and "refs/tags/cua-spaces-v*" in plan
-    assert jobs["electron-mac"]["if"] == "needs.electron-plan.outputs.build == 'true'"
+    assert jobs["electron-mac"]["if"] == gated("needs.electron-plan.outputs.build == 'true'")
     # Windows and Linux build for every release tag, stable included.
     for name in ("electron-native", "electron-windows", "electron-linux"):
-        assert jobs[name]["if"] == "needs.electron-plan.outputs.desktop == 'true'", name
+        assert jobs[name]["if"] == gated("needs.electron-plan.outputs.desktop == 'true'"), name
     publish_gate = jobs["electron-publish"]["if"]
     assert "needs.electron-plan.outputs.publish == 'true'" in publish_gate
     assert "needs.electron-windows.result == 'success' && needs.electron-linux.result == 'success'" in publish_gate

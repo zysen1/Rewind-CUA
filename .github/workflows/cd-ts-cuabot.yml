@@ -29,6 +29,7 @@ env:
 
 jobs:
   prepare:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -56,6 +57,7 @@ jobs:
           echo "tag=cuabot-v${VERSION}" >> $GITHUB_OUTPUT
 
   publish-npm:
+    if: github.repository == 'trycua/cua'
     needs: prepare
     uses: ./.github/workflows/ts-reusable-publish.yml
     with:
@@ -67,6 +69,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create-release:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, publish-npm]
     uses: ./.github/workflows/release-github-reusable.yml
     with:

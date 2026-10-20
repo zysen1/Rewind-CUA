@@ -52,6 +52,7 @@ permissions:
 
 jobs:
   create-release:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

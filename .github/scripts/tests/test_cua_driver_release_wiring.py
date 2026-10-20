@@ -948,7 +948,11 @@ fi
         for job, (called, sha_input) in gates.items():
             block = workflow.split(f"\n  {job}:\n", 1)[1].split("\n\n", 1)[0]
             self.assertIn("    needs: release-attribution-preflight\n", block)
-            self.assertIn(f"    if: ({tag_push}) || inputs.channel == 'nightly'\n", block)
+            self.assertIn(
+                "    if: github.repository == 'trycua/cua' && "
+                f"(({tag_push}) || inputs.channel == 'nightly')\n",
+                block,
+            )
             self.assertIn(f"    uses: ./.github/workflows/{called}\n", block)
             self.assertIn(sha_input, block)
             self.assertIn("      actions: read\n", block)
@@ -973,7 +977,7 @@ fi
             *gates,
         ):
             self.assertIn(f"      - {job}\n", needs)
-        self.assertIn(f"    if: {tag_push}\n", needs)
+        self.assertIn(f"    if: github.repository == 'trycua/cua' && ({tag_push})\n", needs)
         self.assertNotIn("always()", needs)
         self.assertIn("ref: ${{ github.ref }}", steps)
         self.assertIn('if [[ "$SHA" != "$GITHUB_SHA" ]]; then', steps)

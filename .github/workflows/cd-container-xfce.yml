@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   publish:
+    if: github.repository == 'trycua/cua'
     uses: ./.github/workflows/docker-reusable-publish.yml
     with:
       image_name: cua-xfce

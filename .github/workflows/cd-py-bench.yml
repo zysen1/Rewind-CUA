@@ -23,6 +23,7 @@ permissions:
 
 jobs:
   prepare:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.get-version.outputs.version }}
@@ -54,6 +55,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   publish:
+    if: github.repository == 'trycua/cua'
     needs: prepare
     uses: ./.github/workflows/py-reusable-publish.yml
     with:
@@ -65,6 +67,7 @@ jobs:
       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
 
   create-release:
+    if: github.repository == 'trycua/cua'
     needs: [prepare, publish]
     uses: ./.github/workflows/release-github-reusable.yml
     with:
