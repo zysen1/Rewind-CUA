@@ -11,6 +11,9 @@ name: "Bench: streaming (media plane)"
 # numbers track the code, not the last image release. Results are uploaded
 # as an artifact and the run fails on budget regressions (budgets.json).
 # Hardware encoders are reported as deferred (plan §8.6).
+#
+# The job pulls the published trycua Spaces image and fails on the upstream
+# media-plane budgets. Forks skip it.
 
 on:
   schedule:
@@ -50,6 +53,7 @@ env:
 
 jobs:
   bench:
+    if: github.repository == 'trycua/cua'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
