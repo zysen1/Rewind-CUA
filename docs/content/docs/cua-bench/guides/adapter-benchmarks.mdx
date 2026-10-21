@@ -72,7 +72,7 @@ guest's server. `CUA_BENCH_OSWORLD_SPLIT` picks the list (`test_all`,
 
 To keep the upstream disk as is and add only a `cua-driver mcp` service
 (Streamable HTTP on `3000/mcp`), use the recipe in
-[`samples/python/osworld-image`](https://github.com/trycua/cua/tree/main/samples/python/osworld-image).
+[`examples/python/osworld-image`](https://github.com/trycua/cua/tree/main/examples/python/osworld-image).
 It edits an overlay with `virt-customize` (no guest network, `base.qcow2`
 untouched) and packages `disk.img` as a containerDisk. This disk has no
 cua-spacesd; the SDK's OSWorld adapter (`agent_type="osworld"`) talks to the
