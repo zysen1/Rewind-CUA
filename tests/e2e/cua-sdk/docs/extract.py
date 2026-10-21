@@ -54,13 +54,14 @@ POLICY = REPO / "docs" / "code-block-policy.json"
 BASELINE = REPO / "docs" / "code-block-baseline.json"
 
 # Guides with self-contained runnable blocks; `--strict` (and the suite's
-# test_guides_are_tagged) fails if one loses its tags. The Omarchy noVNC and
-# Minecraft flows only have fragments or in-guest shell steps; their behaviour
-# is covered by the SDK scenario tests instead.
+# test_guides_are_tagged) fails if one loses its tags. The sandbox reference
+# in this tree is the single page reference/sandbox.mdx. The Omarchy noVNC
+# and Minecraft flows only have fragments or in-guest shell steps; their
+# behaviour is covered by the SDK scenario tests instead.
 GUIDES = [
     "cua-sdk/guides/agent-frameworks.mdx",
     "cua-sdk/guides/images.mdx",
-    "cua-sdk/reference/sandbox/index.mdx",
+    "cua-sdk/reference/sandbox.mdx",
 ]
 
 FENCE = re.compile(r"^(?P<indent>[ \t]*)(?P<fence>```+|~~~+)(?P<info>.*)$")
