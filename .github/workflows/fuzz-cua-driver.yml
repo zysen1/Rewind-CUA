@@ -16,6 +16,7 @@ on:
       - "libs/cua-driver/rust/crates/cua-driver-testkit/**"
       - "libs/cua-driver/rust/fuzz/**"
       - ".github/workflows/fuzz-cua-driver.yml"
+  # The nightly budget runs only on trycua/cua. Pull requests keep the short run.
   schedule:
     # Nightly long run against main.
     - cron: "17 3 * * *"
@@ -41,6 +42,7 @@ env:
 jobs:
   fuzz:
     name: ${{ matrix.target }}
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:

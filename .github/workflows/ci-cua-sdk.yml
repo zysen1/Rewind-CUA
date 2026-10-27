@@ -28,6 +28,7 @@ on:
       - "libs/fleet/sdk/**"
       - "libs/fleet/sdk-schema/**"
       - ".github/workflows/ci-cua-sdk.yml"
+  # The nightly full matrix runs only on trycua/cua. Push and pull requests are unchanged.
   schedule:
     - cron: "41 18 * * *"
   workflow_dispatch:
@@ -58,6 +59,7 @@ env:
 jobs:
   rust:
     name: rust (${{ matrix.os }})
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -155,6 +157,7 @@ jobs:
   # never depends on the driver workspace (see the boundary check above).
   spaces-e2e:
     name: spaces e2e (${{ matrix.os }})
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -189,6 +192,7 @@ jobs:
 
   bindings:
     name: bindings drift (${{ matrix.os }})
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     strategy:
@@ -225,6 +229,7 @@ jobs:
     # The generated binding must compile (an exported `close` once clashed
     # with AutoCloseable.close; uniffi.toml renames such methods).
     name: kotlin compile
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container: gradle:8.10.2-jdk17
@@ -235,6 +240,7 @@ jobs:
 
   python:
     name: python smoke (${{ matrix.os }})
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ${{ matrix.os }}
     # A cold Windows run builds cua-sdk (release), the fixtures and the CLI:
     # it passed 45 minutes still compiling.
@@ -278,6 +284,7 @@ jobs:
 
   node:
     name: node smoke (${{ matrix.os }})
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ${{ matrix.os }}
     # A cold macOS run (release cua-sdk, fixtures, both CLIs) passed 45
     # minutes still compiling, as python smoke did on Windows.
@@ -316,6 +323,7 @@ jobs:
 
   browser:
     name: browser (wasm32) build + smoke
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     defaults:
@@ -351,7 +359,9 @@ jobs:
 
   swift:
     name: swift smoke (macOS)
-    if: ${{ github.event_name != 'pull_request' || startsWith(github.head_ref, 'release-please--') || contains(github.event.pull_request.labels.*.name, 'ci:full') }}
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      (github.event_name != 'pull_request' || startsWith(github.head_ref, 'release-please--') || contains(github.event.pull_request.labels.*.name, 'ci:full'))
     runs-on: macos-26
     # Cold, the release cua-sdk build alone nears 45 minutes on macos-26.
     timeout-minutes: 90

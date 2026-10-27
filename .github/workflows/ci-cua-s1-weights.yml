@@ -6,6 +6,7 @@ name: "CI: cua-s1 weights"
 # They are deliberately not stored in the Actions cache: the repository's
 # 10 GB cache limit would evict every other workflow's cache.
 on:
+  # Cron runs are upstream-only. Path-filtered pull requests are unchanged.
   schedule:
     - cron: "37 4 * * *"
   workflow_dispatch:
@@ -52,6 +53,7 @@ env:
 jobs:
   smoke:
     name: S1 chooser smoke with pinned weights (CPU, text + multimodal)
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     # Hosted runners vary: with AVX512-BF16 this takes about 40 minutes; without
     # it the cold and warm multimodal decisions alone passed 85 minutes.
@@ -251,6 +253,7 @@ jobs:
     # verifies the effect, and stale captures are refused. It runs here, not
     # in e2e-rust-linux.yml, because it needs the 9.5 GB of pinned weights.
     name: Linux X11 / S1 + OmniParser capture-loop row
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
