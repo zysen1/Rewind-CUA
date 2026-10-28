@@ -25,6 +25,7 @@ name: "E2E: Cua Driver release gate"
 # failures do.
 
 on:
+  # Cron runs are upstream-only. Each job skips them outside trycua/cua.
   schedule:
     - cron: "0 6 * * *"
   pull_request:
@@ -48,6 +49,7 @@ concurrency:
 jobs:
   decide:
     name: "E2E gate / decide"
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -106,7 +108,9 @@ jobs:
   linux:
     name: "gate / Linux E2E"
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.decide.outputs.run == 'true'
     permissions:
       actions: read
       contents: read
@@ -117,7 +121,9 @@ jobs:
   windows:
     name: "gate / Windows E2E"
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.decide.outputs.run == 'true'
     permissions:
       actions: read
       contents: read
@@ -130,7 +136,9 @@ jobs:
   macos:
     name: "gate / macOS hosted E2E"
     needs: decide
-    if: needs.decide.outputs.run == 'true' && github.event_name != 'pull_request'
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.decide.outputs.run == 'true' && github.event_name != 'pull_request'
     permissions:
       actions: read
       contents: read
@@ -225,7 +233,9 @@ jobs:
   browsers:
     name: "gate / standalone browser E2E"
     needs: decide
-    if: needs.decide.outputs.run == 'true'
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.decide.outputs.run == 'true'
     permissions:
       actions: read
       contents: read
@@ -237,7 +247,7 @@ jobs:
   # (path-based requirement); gated PRs need every lane green.
   result:
     name: "E2E gate / result"
-    if: always()
+    if: always() && (github.repository == 'trycua/cua' || github.event_name != 'schedule')
     needs: [decide, linux, windows, macos, macos-pr, browsers]
     runs-on: ubuntu-latest
     timeout-minutes: 5

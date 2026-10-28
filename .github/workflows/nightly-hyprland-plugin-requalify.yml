@@ -26,6 +26,7 @@ name: "Nightly: Hyprland plugin requalification"
 # repository. CI requalification is not native certification.
 
 on:
+  # Cron runs are upstream-only. Pull requests still exercise detect and requalify.
   schedule:
     # Daily 06:41 UTC, after Omarchy edge's usual overnight package builds.
     - cron: "41 6 * * *"
@@ -62,6 +63,7 @@ env:
 
 jobs:
   detect:
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
@@ -107,7 +109,11 @@ jobs:
 
   requalify:
     needs: detect
-    if: needs.detect.outputs.count != '0'
+    # Count is empty when detect is skipped, and empty != '0' is true. The
+    # repository guard must be false first so the matrix is not expanded.
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.detect.outputs.count != '0'
     name: ${{ matrix.channel }} hyprland ${{ matrix.hyprland }}, plugin ${{ matrix.ref }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
@@ -171,7 +177,10 @@ jobs:
 
   report:
     needs: [detect, requalify]
-    if: always() && needs.detect.result == 'success'
+    if: >-
+      always() &&
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.detect.result == 'success'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

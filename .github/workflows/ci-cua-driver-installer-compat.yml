@@ -8,6 +8,8 @@ on:
         required: false
         type: string
         default: ""
+  # Direct cron runs are upstream-only. workflow_call keeps the caller's event
+  # name, so a pull_request caller still runs these jobs on a fork.
   schedule:
     - cron: "17 9 * * 1"
   workflow_dispatch:
@@ -32,6 +34,7 @@ permissions:
 jobs:
   scope:
     name: Resolve installer compatibility scope
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -113,7 +116,9 @@ jobs:
   install:
     name: "${{ matrix.os }} / v${{ matrix.version }}"
     needs: scope
-    if: needs.scope.outputs.should_run == 'true'
+    if: >-
+      (github.repository == 'trycua/cua' || github.event_name != 'schedule') &&
+      needs.scope.outputs.should_run == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -183,7 +188,7 @@ jobs:
   installer-compatibility:
     name: Installer compatibility summary
     needs: [scope, install]
-    if: always()
+    if: always() && (github.repository == 'trycua/cua' || github.event_name != 'schedule')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -21,6 +21,7 @@ on:
       - "scripts/images/doctor_ledger.py"
       - "scripts/images/docs-image-refs-baseline.json"
       - ".github/workflows/ci-check-docs-image-refs.yml"
+  # The nightly ledger check runs only on trycua/cua. Pull requests are unchanged.
   schedule:
     - cron: "11 7 * * *"
   workflow_dispatch:
@@ -35,6 +36,7 @@ concurrency:
 jobs:
   image-refs:
     name: Docs image refs have passing doctor reports
+    if: github.repository == 'trycua/cua' || github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
